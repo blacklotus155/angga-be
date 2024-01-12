@@ -108,7 +108,7 @@ app.post('/data', async (req, res) => {
   const statusKey = ['hvt', 'lvt', 'anomali']
   for (const key of statusKey) {
     if (Object.hasOwn(data, key) && data[key] == '1') {
-      const [result] = await db.query("UPDATE status SET is_error='1', is_blink='1' WHERE `key`=? AND last_ack < DATE_SUB(NOW(), INTERVAL 10 MINUTE)", [key])
+      const [result] = await db.query("UPDATE status SET is_error='1', is_blink='1' WHERE `key`=?", [key])
       if (result.affectedRows > 0) {
         await firestore.collection('status').doc('first').update(data)
         await notification.sendNotification({
