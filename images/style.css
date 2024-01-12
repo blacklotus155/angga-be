@@ -1,0 +1,138 @@
+.sldContent {
+  position: relative;
+  width: fit-content;
+  height: fit-content;
+  text-align: start;
+  color: white;
+}
+
+.q21 {
+  position: absolute;
+  bottom: 95px;
+  left: 160px;
+}
+
+.q22 {
+  position: absolute;
+  bottom: 95px;
+  right: 102px;
+}
+
+.line-to-q50 {
+  position: absolute;
+  bottom: 134px;
+  right: 61px;
+}
+
+.q381 {
+  position: absolute;
+  bottom: 202px;
+  right: 11px;
+}
+
+.q50 {
+  position: absolute;
+  bottom: 255px;
+  right: 142px;
+}
+
+.line-to-q28 {
+  position: absolute;
+  top: 127px;
+  right: 61px;
+}
+
+.line-from-q28 {
+  position: absolute;
+  top: 0px;
+  right: 61px;
+}
+
+.q382 {
+  position: absolute;
+  top: 154px;
+  right: 11px;
+}
+
+.q28 {
+  position: absolute;
+  top: 87px;
+  right: 142px;
+}
+
+.q38 {
+  position: absolute;
+  top: 34px;
+  right: 11px;
+}
+
+
+.bar {
+  position: absolute;
+  top: 0px;
+}
+
+.pms1 {
+  position: absolute;
+  top: 90px;
+  left: 61px;
+}
+
+.pms2 {
+  position: absolute;
+  top: 90px;
+  right: 61px;
+}
+
+.y {
+  position: absolute;
+  top: 128px;
+  right: 75px;
+}
+
+.cb150 {
+  position: absolute;
+  top: 210px;
+  right: 111px;
+}
+.line1 {
+  position: absolute;
+  top: 250px;
+  right: 114px;
+}
+.trafo {
+  position: absolute;
+  top: 290px;
+  right: 105px;
+}
+.line2 {
+  position: absolute;
+  top: 330px;
+  right: 114px;
+}
+.cb20{
+  position: absolute;
+  top: 370px;
+  right: 111px;
+}
+.arrow {
+  position: absolute;
+  top: 403px;
+  right: 113px;
+  filter: saturate(100%);
+}
+
+.isActiveColor {
+  filter: invert(55%) sepia(100%) saturate(100) hue-rotate(360deg)
+}
+
+.blinking-background {
+  animation: blinkBackground 1s infinite;
+}
+
+/* Define the 'blinkBackground' animation */
+@keyframes blinkBackground {
+  0% { background-color: red; } /* Start with one color */
+  50% { background-color: green; } /* Transition to another color at 50% of the animation */
+  100% { background-color: red; } /* Return to the initial color at the end of the animation */
+}

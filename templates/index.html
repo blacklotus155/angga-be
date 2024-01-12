@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link href="images/style.css" rel="stylesheet"></link>
+  </head>
+  <body>
+    <div class="">
+      <div class="row">
+        <div class="col">
+          <div class="row" id="chart">
+          </div>
+
+          <div class="card ms-2">
+            <div class="card-body">
+              <div class="d-flex flex-column" >
+                <table class="table table-bordered border-white" id="statusInfo">
+                </table>
+                <div class="row" id="actionButton">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="col text-center">
+          <div class="sldContent">
+            <img src="images/new/newBase.svg" alt="">
+            <div class="bar isActiveColor" id="bar">
+              <img src="images/new/bar.svg" alt="">
+            </div>
+            <div class="pms1" id="pms1">
+              <img src="images/new/pms.svg" alt="">
+            </div>
+            <div class="pms2" id="pms2">
+              <img src="images/new/pms.svg" alt="">
+            </div>
+            <div class="y" id="y">
+              <img src="images/new/y.svg" alt="">
+            </div>
+            <div class="cb150" id="cb150">
+              <img src="images/new/cb.svg" alt="">
+            </div>
+            <div class="line1" id="line1">
+              <img src="images/new/line.svg" alt="">
+            </div>
+            <div class="trafo" id="trafo">
+              <img src="images/new/trafo.svg" alt="">
+            </div>
+            <div class="line2" id="line2">
+              <img src="images/new/line.svg" alt="">
+            </div>
+            <div class="cb20" id="cb20">
+              <img src="images/new/cb.svg" alt="">
+            </div>
+            <div class="arrow" id="arrow">
+              <img src="images/new/arrow.svg" alt="">
+            </div>
+          </div>
+        </div>
+        <div class="col">
+
+          <h5>Measurements</h5>
+          <table class="table table-primary table-striped">
+            <caption></caption>
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Value</th>
+                <th scope="col">Unit</th>
+              </tr>
+            </thead>
+            <tbody id="current_power">
+            </tbody>
+            <tfoot>
+              <!-- <tr >
+                <td colspan="3" class="text-center">CT ratio: 1000/1</td>
+              </tr> -->
+            </tfoot>
+          </table>
+          
+        </div>
+
+      </div>
+    </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io({transports: ["websocket"]});
+      
+      function sendMessage() {
+        let message = prompt("Masukan pesan");
+
+        if (message != null) {
+          socket.emit("sendNotification", message)
+        }
+      }
+      
+      socket.on("error", () => {
+        console.log("socket error")
+        alert('Mohon muat ulang halaman')
+      })
+      socket.on("connect", () => {
+        console.log("connect")
+      });
+      socket.on("connect_error", (error) => {
+        console.log("connect error")
+        alert('Tidak dapat terhubung ke server')
+      });
+
+      function createChart(){
+        var options = {
+          series: [{
+            name: "",
+            data: []
+        }],
+          chart: {
+          height: 350,
+          type: 'line',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'History daya',
+          align: 'left'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+          categories: [],
+        }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#chart"), options);
+        chart.render();
+        return chart
+      }
+
+      function setMeasurementData(data) {
+        const body = document.getElementById("current_power")
+        const values = data.map(item => {
+          return `
+            <tr>
+              <td>${item.name}</td>
+              <td>${item.value}</td>
+              <td>${item.unit}</td>
+            </tr>
+          `
+        })
+        body.innerHTML = values.join("")
+      }
+
+      const chart = createChart()
+      //chart
+      socket.on("chart", (data) => {
+        chart.updateSeries([{
+          data: data.map(item => item.watt)
+        }])
+        chart.updateOptions({
+          xaxis: {
+            categories: data.map(item => item.time),
+          }
+        })
+      })
+
+      socket.on("measurement", (data) => {
+        setMeasurementData(data)
+      })
+
+      socket.on('sld', ({pms1, pms2, cb150, trafo, cb20}) => {
+        const pms1Element = document.querySelector('#pms1')
+        const pms2Element = document.querySelector('#pms2')
+        const yElement = document.querySelector('#y')
+        const cb150Element = document.querySelector('#cb150')
+        const line1Element = document.querySelector('#line1')
+        const trafoElement = document.querySelector('#trafo')
+        const line2Element = document.querySelector('#line2')
+        const cb20Element = document.querySelector('#cb20')
+        const arrowElement = document.querySelector('#arrow')
+
+        function setColor(status, element){
+          if(status) {
+            element.classList.add('isActiveColor')
+          } else {
+            element.classList.remove('isActiveColor')
+          }
+        }
+        const y = pms1 || pms2
+        const line1 = y && cb150
+        const line2 = line1 && trafo
+        const arrow = line2 && cb20
+        setColor(pms1, pms1Element)
+        setColor(pms2, pms2Element)
+        setColor(y, yElement)
+        setColor(cb150, cb150Element)
+        setColor(line1, line1Element)
+        setColor(trafo, trafoElement)
+        setColor(line2, line2Element)
+        setColor(cb20, cb20Element)
+        setColor(arrow, arrowElement)
+      })
+
+      socket.on('status', data => {
+        const body = document.getElementById("statusInfo")
+        let element = ''
+        data.forEach((item, index) => {
+          const colorBlink = item.isBlink ? 'blinking-background' : 'bg-danger'
+          const color = item.isError ? colorBlink : 'bg-success'
+          
+          if (index % 2 == 0) {
+            element += `<tr> <td class="${color} text-white">${item.name}</td>`
+          } else {
+            element += `<td class="${color} text-white">${item.name}</td></tr>`
+          }
+        });
+        body.innerHTML = element
+      })
+
+      socket.on('actionButton', data => {
+        const body = document.getElementById("actionButton")
+        const html = data.map((item) => {
+          return `<div class="col"><btn class="btn btn-primary" onClick="sendAction('${item.id}')">${item.name}</btn></div>`
+        }).join('')
+        body.innerHTML = html
+      })
+
+      
+
+      function sendAction(name){
+        socket.emit('action', name)
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        socket.emit("init", {})
+      });
+
+    </script>
+  </body>
+</html>
